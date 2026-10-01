@@ -283,17 +283,22 @@ app.post(/.*meta(\.html)?$/, (req, res) => {
     renderHtmlWithCampaign(path.join(__dirname, 'BimaVoucher', 'meta.html'), req, res, msisdn);
 });
 
+
+
 // Callback Result Page Route (serves callback.html with server-injected campaign, domain verification, and pixel)
-app.get(/.*callback(\.html)?$/, (req, res) => {
+app.get("/callback.html", (req, res) => {
     console.log(`\n[ENDPOINT HIT] GET callback.html -> Serving callback.html with server-injected campaign for path: ${req.path}`);
     renderHtmlWithCampaign(path.join(__dirname, 'callback.html'), req, res);
 });
 
-app.post(/.*callback(\.html)?$/, (req, res) => {
-    const msisdn = (req.body && req.body.msisdn) || (req.query && req.query.msisdn) || '';
-    console.log(`\n[ENDPOINT HIT] POST callback.html -> MSISDN: "${msisdn}"`);
-    renderHtmlWithCampaign(path.join(__dirname, 'callback.html'), req, res, msisdn);
-});
+
+
+// app.post(/.*callback(\.html)?$/, (req, res) => {
+//     const msisdn = (req.body && req.body.msisdn) || (req.query && req.query.msisdn) || '';
+//     console.log(`\n[ENDPOINT HIT] POST callback.html -> MSISDN: "${msisdn}"`);
+//     renderHtmlWithCampaign(path.join(__dirname, 'callback.html'), req, res, msisdn);
+// });
+
 
 // Root route handler (serves meta landing page with server injection)
 app.get('/', (req, res) => {
@@ -811,10 +816,13 @@ app.get('/api/jazzcash-form', rateLimitMiddleware(10, 60000), (req, res) => {
    ────────────────────────────────────────────────────────────────── */
 const handleJcmsCallback = (req, res) => {
     const data = { ...req.query, ...req.body };
+
+    console.log("----------------Hi my name is ahmed-------");
     console.log(`\n========================================`);
     console.log(`[ENDPOINT HIT] ${req.method} ${req.path} -> JCMS Callback`);
     console.log(`[JCMS Callback] Data:`, data);
     console.log(`========================================`);
+
 
     const status = data.status || data.pp_ResponseCode || data.pp_TxnResponseCode || '';
     const message = data.message || data.pp_ResponseMessage || data.pp_TxnResponseMessage || '';
@@ -833,13 +841,15 @@ const handleJcmsCallback = (req, res) => {
     res.redirect(`${targetPage}?${query}`);
 };
 
+// http://localhost:3000/callback.html?status=1&message=success&trxRefNo=BINJZDTC1786003218063&campaignCode=default
+
 // Standard Callback Routes (supports /jcms/callback and /jcm/callback)
 app.post('/jcms/callback', handleJcmsCallback);
-app.get('/jcms/callback', handleJcmsCallback);
-app.post('/jcm/callback', handleJcmsCallback);
-app.get('/jcm/callback', handleJcmsCallback);
+// app.get('/jcms/callback', handleJcmsCallback);
+// app.get('/jcms/callbk', handleJcmsCallback);
+// app.get('/jcm/callback', handleJcmsCallback);
 
-// Dynamic Callback Routes (supports /jcms/ and /jcm/ with underscore and hyphen)
+// // Dynamic Callback Routes (supports /jcms/ and /jcm/ with underscore and hyphen)
 app.post('/jcms/callback-dynamic', handleJcmsCallback);
 app.get('/jcms/callback-dynamic', handleJcmsCallback);
 app.post('/jcms/callback_dynamic', handleJcmsCallback);
